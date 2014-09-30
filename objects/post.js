@@ -1,6 +1,6 @@
 module.exports = {
     name: 'tag',
-        plural: 'tags',
+    plural: 'tags',
     model: {
         fields: {
             id          : { type : "serial", key: true },

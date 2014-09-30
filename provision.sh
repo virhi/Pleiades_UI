@@ -10,15 +10,11 @@ sudo apt-get -y install nodejs
 
 sudo apt-get -y install npm
 
-
-echo "mysql-server mysql-server/root_password password root" | debconf-set-selections
-echo "mysql-server mysql-server/root_password_again password root" | debconf-set-selections
-
-sudo apt-get install -y mysql-server
-
-sudo apt-get install -y mysql-client
-
 sudo npm install -g nvm
+
+sudo npm install -g nodemon
+
+sudo ln -s /usr/bin/nodejs /usr/local/bin/node
 
 # Configuring alias
 cat <<EOT >/home/vagrant/.bashrc_alias
@@ -38,4 +34,13 @@ sudo npm install pleiades
 
 sudo npm install twig
 
-sudo npm install nodemon
+
+
+sudo npm install bootstrap
+
+## a voir pourquoi cela ne marche pas....
+echo "mysql-server mysql-server/root_password password root" | debconf-set-selections
+echo "mysql-server mysql-server/root_password_again password root" | debconf-set-selections
+sudo apt-get install -y mysql-server
+
+sudo apt-get install -y mysql-client

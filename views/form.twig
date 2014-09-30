@@ -1,0 +1,16 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <h1> form : {{ formobject.name }} </h1>
+
+    <form role="form">
+        {% for fieldName, field in formobject.model.fields %}
+            <div class="form-group">
+                <label for="{{ fieldName }}">{{ fieldName }}</label>
+                <input type="{{ field.type }}" class="form-control" id="{{ fieldName }}" placeholder="{{ fieldName }}">
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+
+{% endblock %}
