@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 
 sudo apt-get update
@@ -30,17 +30,6 @@ cd /vagrant
 
 sudo npm install express
 
-sudo npm install pleiades
-
 sudo npm install twig
 
-
-
 sudo npm install bootstrap
-
-## a voir pourquoi cela ne marche pas....
-echo "mysql-server mysql-server/root_password password root" | debconf-set-selections
-echo "mysql-server mysql-server/root_password_again password root" | debconf-set-selections
-sudo apt-get install -y mysql-server
-
-sudo apt-get install -y mysql-client

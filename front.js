@@ -4,6 +4,7 @@
 
 
 var express = require('express');
+var request = require('request');
 var app = express();
 var twig = require('twig');
 
@@ -19,7 +20,8 @@ app.get('/', function(req, res){
     });
 });
 
-app.get('/post/edit', function(req, res){
+app.get('/tag/edit', function(req, res){
+
     object = {
         name: 'tag',
         plural: 'tags',
@@ -37,6 +39,23 @@ app.get('/post/edit', function(req, res){
             {name : 'DELETE'}
         ]
     };
+
+    var options = {
+        url: 'http://10.10.10.160:3000/objects/all',
+        headers: {
+            'User-Agent': 'request'
+        }
+    };
+
+    function callback(error, response, body) {
+        if (!error && response.statusCode == 200) {
+            var info = JSON.parse(body);
+            console.log(info);
+        }
+    }
+
+    request(options, callback);
+
     res.render('form', {
         formobject : object
     });

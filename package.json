@@ -1,0 +1,32 @@
+{
+    "name": "pleiades_ui",
+    "version": "0.0.1",
+    "description": "admin ui",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "express": "~4.9.5",
+        "request": "~2.44.0",
+        "twig": "~0.7.2",
+        "bootstrap": "~3.2.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/virhi/Pleiades_UI"
+    },
+    "keywords": [
+        "pleiades",
+        "express",
+        "twig",
+        "bootstrap"
+    ],
+    "author": {
+        "name": "Vincent Rhino"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/virhi/Pleiades_UI/issues"
+    }
+}
