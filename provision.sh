@@ -12,8 +12,6 @@ sudo apt-get -y install npm
 
 sudo npm install -g nvm
 
-sudo npm install -g nodemon
-
 sudo ln -s /usr/bin/nodejs /usr/local/bin/node
 
 # Configuring alias
@@ -33,3 +31,5 @@ sudo npm install express
 sudo npm install twig
 
 sudo npm install bootstrap
+
+sudo npm install chokidar

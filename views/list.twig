@@ -1,0 +1,10 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    Voici mon message :
+
+    {% for object in body %}
+        {{ object.name }}
+    {% endfor %}
+
+{% endblock %}
