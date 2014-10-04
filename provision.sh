@@ -28,6 +28,8 @@ cd /vagrant
 
 sudo npm install express
 
+#sudo npm install express-hal
+
 sudo npm install twig
 
 sudo npm install bootstrap

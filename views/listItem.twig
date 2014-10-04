@@ -1,24 +1,33 @@
 {% extends "layout.twig" %}
 
 {% block content %}
-
-    {% for object in list %}
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <form class="form-horizontal" role="form">
-                    <fieldset disabled>
+    <!-- Table -->
+    <div class="panel panel-default">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
                         {% for fieldName, field in squelette.model.fields %}
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label" for="{{ fieldName }}">{{ fieldName }} :</label>
-                                <div class="col-sm-10">
-                                    <input type="{{ field.type }}" class="form-control" id="{{ fieldName }}" placeholder="{{ attribute(object, fieldName) }}" value="{{ attribute(object, fieldName) }}">
-                                </div>
-                            </div>
+                            {% if field.list %}
+                                <th>{{ fieldName }}</th>
+                            {% endif %}
                         {% endfor %}
-                    </fieldset>
-                </form>
-            </div>
+                        <th>action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for object in list %}
+                        <tr>
+                            {% for fieldName, field in squelette.model.fields %}
+                                {% if field.list %}
+                                    <td>{{ attribute(object, fieldName) }}</td>
+                                {% endif %}
+                            {% endfor %}
+                            <td><a href="{{ object.link.self }}">Voir plus</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    {% endfor %}
-
+    </div>
 {% endblock %}

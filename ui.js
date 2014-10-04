@@ -2,6 +2,9 @@
 var express = require('express');
 var app     = express();
 
+//var hal     = require("express-hal");
+//app.use(hal.middleware);
+
 app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
 app.use(express.static(__dirname + '/public'));
 

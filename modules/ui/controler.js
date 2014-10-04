@@ -2,8 +2,9 @@
 
 module.exports = function(app, settings, callback) {
 
-    var request = require('request');
-    var twig    = require('twig');
+    var request       = require('request');
+    var twig          = require('twig');
+    var objectService = require(__dirname + '/objectService.js');
 
     app.set('views', __dirname + '/../../views');
     app.set('view engine', 'twig');
@@ -28,11 +29,13 @@ module.exports = function(app, settings, callback) {
         request(options, function(error, response, body){
 
             if (!error && response.statusCode == 200) {
+
                 var body = JSON.parse(body);
                 res.render('list', {
                     body : body
                 });
             }
+
         });
     });
 
@@ -52,9 +55,9 @@ module.exports = function(app, settings, callback) {
                 plural: 'posts',
                 model: {
                     fields: {
-                        id          : { type : "serial", key: true },
-                        title       : { type: "text" },
-                        description : { type: "text" }
+                        id          : { type : "serial", key: true, list: true },
+                        title       : { type: "text", list: true },
+                        description : { type: "text", list: true }
                     }
                 },
                 methods : [
@@ -72,7 +75,7 @@ module.exports = function(app, settings, callback) {
                     case 200:
                         var body = JSON.parse(body);
                         res.render('listItem', {
-                            list : body,
+                            list : objectService.buildList(object, body),
                             squelette: object
 
                         });
