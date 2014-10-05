@@ -60,7 +60,7 @@ module.exports = function(app, settings, callback) {
                 ]
             };
 
-            sendResult(req, res, error, response, body, object, 'listItem');
+            sendResult(req, res, error, response, body, object, 'listItem', true);
 
         });
     });
@@ -141,17 +141,23 @@ module.exports = function(app, settings, callback) {
         });
     });
 
-    var sendResult = function(req, res, error, response, body, squelette, renderView) {
+    var sendResult = function(req, res, error, response, body, squelette, renderView, buildList) {
+
+        buildList = typeof buildList !== 'undefined' ? buildList : false;
 
         fields = objectService.getFields(settings, squelette);
         title  = objectService.getObjectName(settings, squelette);
-        
+
         if (error) {
             throw error;
         } else {
             switch (response.statusCode) {
                 case 200:
                     var body = JSON.parse(body);
+
+                    if (buildList != false) {
+                        body = objectService.buildList(settings, squelette, body);
+                    }
                     res.render(renderView, {
                         title: title,
                         body : body,
