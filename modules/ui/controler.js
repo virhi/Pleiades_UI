@@ -13,7 +13,7 @@ module.exports = function(app, settings, callback) {
 
     app.get('/', function(req, res){
         res.render('index', {
-            message : "Hello World"
+            body : "Hello World"
         });
     });
 
@@ -27,15 +27,7 @@ module.exports = function(app, settings, callback) {
         };
 
         request(options, function(error, response, body){
-
-            if (!error && response.statusCode == 200) {
-
-                var body = JSON.parse(body);
-                res.render('list', {
-                    body : body
-                });
-            }
-
+            sendResult(req, res, error, response, body, {}, 'list');
         });
     });
 
@@ -68,25 +60,8 @@ module.exports = function(app, settings, callback) {
                 ]
             };
 
-            if (error) {
-                throw error;
-            } else {
-                switch (response.statusCode) {
-                    case 200:
-                        var body = JSON.parse(body);
-                        res.render('listItem', {
-                            list : objectService.buildList(settings, object, body),
-                            squelette: object
+            sendResult(req, res, error, response, body, object, 'listItem');
 
-                        });
-                        break;
-                    case 404:
-                        res.render('index', {
-                            message : body
-                        });
-                        break;
-                }
-            }
         });
     });
 
@@ -101,7 +76,7 @@ module.exports = function(app, settings, callback) {
             }
         };
 
-        squelette = {
+        var squelette = {
             name: 'post',
             plural: 'posts',
             model: {
@@ -119,13 +94,8 @@ module.exports = function(app, settings, callback) {
             ]
         };
 
-        request(options, function(error, response, body){
-            var body = JSON.parse(body);
-            console.log((body));
-            res.render('item', {
-                object : body[0],
-                squelette: squelette
-            });
+        request(options, function(error, response, body) {
+            sendResult(req, res, error, response, body, squelette, 'item');
         });
     });
 
@@ -166,8 +136,36 @@ module.exports = function(app, settings, callback) {
         request(options, callback);
 
         res.render('form', {
-            formobject : object
+            title: object.name,
+            fields: object.model.fields
         });
     });
+
+    var sendResult = function(req, res, error, response, body, squelette, renderView) {
+
+        fields = objectService.getFields(settings, squelette);
+        title  = objectService.getObjectName(settings, squelette);
+        
+        if (error) {
+            throw error;
+        } else {
+            switch (response.statusCode) {
+                case 200:
+                    var body = JSON.parse(body);
+                    res.render(renderView, {
+                        title: title,
+                        body : body,
+                        fields: fields
+                    });
+                    break;
+                case 404:
+                    res.render('index', {
+                        body : body
+                    });
+                    break;
+            }
+        }
+
+    }
 
 }

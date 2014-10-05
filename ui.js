@@ -12,7 +12,9 @@ var defaultSettings = {
     api: {
         host: "http://10.10.10.161:3000"
     },
-    viewItemUrl: "/item/"
+    viewItemUrl: "/item/",
+    squeleteFields: 'model.fields',
+    squeleteName: 'name'
 };
 
 var controler      = require(__dirname + '/modules/ui/controler.js');

@@ -1,10 +1,10 @@
 {% extends "layout.twig" %}
 
 {% block content %}
-    <h1> form : {{ formobject.name }} </h1>
+    <h1> form : {{ title }} </h1>
 
     <form role="form">
-        {% for fieldName, field in formobject.model.fields %}
+        {% for fieldName, field in fields %}
             <div class="form-group">
                 <label for="{{ fieldName }}">{{ fieldName }}</label>
                 <input type="{{ field.type }}" class="form-control" id="{{ fieldName }}" placeholder="{{ fieldName }}">
