@@ -1,7 +1,7 @@
 var extend = require('util')._extend;
 
 var objectService = {
-    buildList: function(squelette, inputList) {
+    buildList: function(settings, squelette, inputList) {
         var list = [];
         var objectFieldPrimarayKey = '';
 
@@ -18,7 +18,7 @@ var objectService = {
         function buildLink(item, index) {
             var objTmp = {
                 link: {
-                    self: '/item/' + squelette.name + '/' + item[objectFieldPrimarayKey]
+                    self: settings.viewItemUrl + squelette.name + '/' + item[objectFieldPrimarayKey]
                 }
             }
 

@@ -75,7 +75,7 @@ module.exports = function(app, settings, callback) {
                     case 200:
                         var body = JSON.parse(body);
                         res.render('listItem', {
-                            list : objectService.buildList(object, body),
+                            list : objectService.buildList(settings, object, body),
                             squelette: object
 
                         });
@@ -87,6 +87,45 @@ module.exports = function(app, settings, callback) {
                         break;
                 }
             }
+        });
+    });
+
+    app.get(settings.viewItemUrl + ':object/:id', function(req, res, next){
+
+        var options = {
+            method: 'GET',
+            url: settings.api.host + '/' + req.params.object,
+            headers: {
+                'User-Agent': 'request',
+                'X-Fields': '{"id": ' + req.params.id + '}'
+            }
+        };
+
+        squelette = {
+            name: 'post',
+            plural: 'posts',
+            model: {
+                fields: {
+                    id          : { type : "serial", key: true, list: true },
+                    title       : { type: "text", list: true },
+                    description : { type: "text", list: true }
+                }
+            },
+            methods : [
+                {name : 'GET'},
+                {name : 'POST'},
+                {name : 'PUT'},
+                {name : 'DELETE'}
+            ]
+        };
+
+        request(options, function(error, response, body){
+            var body = JSON.parse(body);
+            console.log((body));
+            res.render('item', {
+                object : body[0],
+                squelette: squelette
+            });
         });
     });
 

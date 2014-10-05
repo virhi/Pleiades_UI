@@ -11,7 +11,8 @@ app.use(express.static(__dirname + '/public'));
 var defaultSettings = {
     api: {
         host: "http://10.10.10.161:3000"
-    }
+    },
+    viewItemUrl: "/item/"
 };
 
 var controler      = require(__dirname + '/modules/ui/controler.js');
