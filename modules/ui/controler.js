@@ -100,6 +100,41 @@ module.exports = function(app, settings, callback) {
         });
     });
 
+    app.get(settings.editItemUrl + ':object/:id', function(req, res, next){
+
+        var options = {
+            method: 'GET',
+            url: settings.api.host + '/' + req.params.object,
+            headers: {
+                'User-Agent': 'request',
+                'X-Fields': '{"id": ' + req.params.id + '}'
+            }
+        };
+
+        var squelette = {
+            name: 'post',
+            plural: 'posts',
+            model: {
+                fields: {
+                    id          : { type : "serial", key: true, list: true },
+                    title       : { type: "text", list: true },
+                    description : { type: "text", list: true }
+                }
+            },
+            methods : [
+                {name : 'GET'},
+                {name : 'POST'},
+                {name : 'PUT'},
+                {name : 'DELETE'}
+            ]
+        };
+
+        request(options, function(error, response, body) {
+            sendResult(req, res, error, response, body, squelette, 'edit');
+        });
+    });
+
+
     app.get('/tag/edit', function(req, res) {
 
         object = {
@@ -108,8 +143,8 @@ module.exports = function(app, settings, callback) {
             model: {
                 fields: {
                     id          : { type : "serial", key: true },
-                    title       : { type: "text" },
-                    description : { type: "text" }
+                    title       : { type: "text", required: true },
+                    description : { type: "text", required: false }
                 }
             },
             methods : [
@@ -127,18 +162,30 @@ module.exports = function(app, settings, callback) {
             }
         };
 
-        function callback(error, response, body) {
+        request(options, function callback(error, response, body) {
             if (!error && response.statusCode == 200) {
                 var info = JSON.parse(body);
-                console.log(info);
+                sendResult(req, res, error, response, body, object, 'form');
             }
-        }
+        });
+    });
 
-        request(options, callback);
+    app.post('/toto/edit', function(req, res) {
 
-        res.render('form', {
-            title: object.name,
-            fields: object.model.fields
+        console.log(JSON.stringify(req.body));
+        var options = {
+            method: 'POST',
+            url: settings.api.host + '/tag',
+            headers: {
+                'User-Agent': 'request',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(req.body)
+        };
+
+        request(options, function callback(error, response, body) {
+            console.log(response.statusCode);
+            sendResult(req, res, error, response, body, object, 'index');
         });
     });
 
@@ -184,6 +231,7 @@ module.exports = function(app, settings, callback) {
         } else {
             switch (response.statusCode) {
                 case 200:
+                case 201:
                     var body = JSON.parse(body);
 
                     if (buildList != false) {
@@ -199,6 +247,11 @@ module.exports = function(app, settings, callback) {
                     break;
                 case 404:
                     res.render('index', {
+                        body : body
+                    });
+                    break;
+                case 500:
+                    res.render('error', {
                         body : body
                     });
                     break;

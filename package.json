@@ -19,6 +19,7 @@
     "keywords": [
         "pleiades",
         "express",
+        "body-parser",
         "twig",
         "bootstrap"
     ],

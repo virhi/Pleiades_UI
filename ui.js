@@ -1,9 +1,12 @@
 
-var express = require('express');
-var app     = express();
+var express    = require('express');
+var bodyParser = require('body-parser');
+var app        = express();
 
 //var hal     = require("express-hal");
 //app.use(hal.middleware);
+
+app.use(bodyParser());
 
 app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
 app.use(express.static(__dirname + '/public'));
@@ -14,6 +17,7 @@ var defaultSettings = {
         host: "http://10.10.10.161:3000"
     },
     viewItemUrl: "/item/",
+    editItemUrl: "/edit/",
     squeleteFields: 'model.fields',
     squeleteName: 'name'
 };

@@ -3,14 +3,28 @@
 {% block content %}
     <h1> form : {{ title }} </h1>
 
-    <form role="form">
+    <form class="form-horizontal" role="form" method="post" action="/toto/edit">
         {% for fieldName, field in fields %}
-            <div class="form-group">
-                <label for="{{ fieldName }}">{{ fieldName }}</label>
-                <input type="{{ field.type }}" class="form-control" id="{{ fieldName }}" placeholder="{{ fieldName }}">
-            </div>
+            {% if field.key is defined and field.key == true %}
+                <div class="form-group">
+                    <label for="{{ fieldName }}">{{ fieldName }}</label>
+                    <input type="{{ field.type }}" name="{{ fieldName }}" disabled class="form-control" id="{{ fieldName }}" placeholder="{{ fieldName }}">
+                </div>
+            {% else %}
+                <div class="form-group">
+                    <label for="{{ fieldName }}">{{ fieldName }}</label>
+                    <input type="{{ field.type }}" name="{{ fieldName }}" class="form-control" id="{{ fieldName }}" placeholder="{{ fieldName }}" {% if field.required %} required {% endif %}>
+                </div>
+            {% endif %}
         {% endfor %}
-        <button type="submit" class="btn btn-default">Submit</button>
+        <div class="form-group text-right">
+            <div class="col-sm-8">
+            </div>
+            <div class="col-sm-4 ">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="reset" class="btn btn-default">Reset</button>
+            </div>
+        </div>
     </form>
 
 {% endblock %}
