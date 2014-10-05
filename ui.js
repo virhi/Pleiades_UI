@@ -9,6 +9,7 @@ app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
 app.use(express.static(__dirname + '/public'));
 
 var defaultSettings = {
+    brand: 'Pleaides UI',
     api: {
         host: "http://10.10.10.161:3000"
     },

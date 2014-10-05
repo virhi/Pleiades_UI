@@ -5,6 +5,7 @@ module.exports = function(app, settings, callback) {
     var request       = require('request');
     var twig          = require('twig');
     var objectService = require(__dirname + '/objectService.js');
+    var menu          = [];
 
     app.set('views', __dirname + '/../../views');
     app.set('view engine', 'twig');
@@ -141,12 +142,42 @@ module.exports = function(app, settings, callback) {
         });
     });
 
+    var getMenu = function(menu) {
+
+        var info = null;
+        var options = {
+            url: settings.api.host + '/objects/all',
+            headers: {
+                'User-Agent': 'request'
+            }
+        };
+
+
+        function callback(error, response, body) {
+            function buildMenu(field, index) {
+                var tmpObj = {
+                    name: field.name,
+                    url: '/list/' + field.name
+                }
+                menu[index] = tmpObj;
+            };
+
+            if (!error && response.statusCode == 200) {
+                info = JSON.parse(body);
+                info.forEach(buildMenu);
+            }
+        }
+        request(options, callback);
+    };
+
     var sendResult = function(req, res, error, response, body, squelette, renderView, buildList) {
 
         buildList = typeof buildList !== 'undefined' ? buildList : false;
 
         fields = objectService.getFields(settings, squelette);
         title  = objectService.getObjectName(settings, squelette);
+
+        getMenu(menu);
 
         if (error) {
             throw error;
@@ -159,6 +190,8 @@ module.exports = function(app, settings, callback) {
                         body = objectService.buildList(settings, squelette, body);
                     }
                     res.render(renderView, {
+                        brand: settings.brand,
+                        menu: menu,
                         title: title,
                         body : body,
                         fields: fields
