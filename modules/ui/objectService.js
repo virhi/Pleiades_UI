@@ -1,6 +1,8 @@
-var extend = require('util')._extend;
+var extend  = require('util')._extend;
+var request = require('request');
 
 var objectService = {
+
     /* get fields for object description */
     getFields: function(settings, squelette) {
         var result     = null;

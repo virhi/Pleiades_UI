@@ -5,6 +5,7 @@ module.exports = function(app, settings, callback) {
     var request       = require('request');
     var twig          = require('twig');
     var objectService = require(__dirname + '/objectService.js');
+    var RSVP          = require('rsvp');
     var menu          = [];
 
     app.set('views', __dirname + '/../../views');
@@ -18,6 +19,10 @@ module.exports = function(app, settings, callback) {
         });
     });
 
+    app.get('/test/:object', function(req, res) {
+        sendPage(req, res, req.params.object, 'index');
+    });
+
     app.get('/lists', function(req, res){
 
         var options = {
@@ -27,48 +32,27 @@ module.exports = function(app, settings, callback) {
             }
         };
 
+
         request(options, function(error, response, body){
             sendResult(req, res, error, response, body, {}, 'list');
         });
     });
 
-    app.get('/list/:object', function(req, res, next){
+    app.get('/list/:object', function(req, res, next) {
 
-        var options = {
+        var reqOptions = {
             url: settings.api.host + '/' + req.params.object,
             headers: {
                 'User-Agent': 'request'
             }
         };
 
-        request(options, function(error, response, body){
-
-            object = {
-                name: 'post',
-                plural: 'posts',
-                model: {
-                    fields: {
-                        id          : { type : "serial", key: true, list: true },
-                        title       : { type: "text", list: true },
-                        description : { type: "text", list: true }
-                    }
-                },
-                methods : [
-                    {name : 'GET'},
-                    {name : 'POST'},
-                    {name : 'PUT'},
-                    {name : 'DELETE'}
-                ]
-            };
-
-            sendResult(req, res, error, response, body, object, 'listItem', true);
-
-        });
+        var pageObject = buildPageObject(req, res, reqOptions, 'listItem', req.params.object, true);
+        sendPage(pageObject);
     });
 
     app.get(settings.viewItemUrl + ':object/:id', function(req, res, next){
-
-        var options = {
+        var reqOptions = {
             method: 'GET',
             url: settings.api.host + '/' + req.params.object,
             headers: {
@@ -77,27 +61,8 @@ module.exports = function(app, settings, callback) {
             }
         };
 
-        var squelette = {
-            name: 'post',
-            plural: 'posts',
-            model: {
-                fields: {
-                    id          : { type : "serial", key: true, list: true },
-                    title       : { type: "text", list: true },
-                    description : { type: "text", list: true }
-                }
-            },
-            methods : [
-                {name : 'GET'},
-                {name : 'POST'},
-                {name : 'PUT'},
-                {name : 'DELETE'}
-            ]
-        };
-
-        request(options, function(error, response, body) {
-            sendResult(req, res, error, response, body, squelette, 'item');
-        });
+        var pageObject = buildPageObject(req, res, reqOptions, 'item', req.params.object, false);
+        sendPage(pageObject);
     });
 
     app.get(settings.editItemUrl + ':object/:id', function(req, res, next){
@@ -172,7 +137,6 @@ module.exports = function(app, settings, callback) {
 
     app.post('/toto/edit', function(req, res) {
 
-        console.log(JSON.stringify(req.body));
         var options = {
             method: 'POST',
             url: settings.api.host + '/tag',
@@ -217,47 +181,109 @@ module.exports = function(app, settings, callback) {
         request(options, callback);
     };
 
-    var sendResult = function(req, res, error, response, body, squelette, renderView, buildList) {
+    var sendPage = function(pageObject) {
 
-        buildList = typeof buildList !== 'undefined' ? buildList : false;
+        var options = {
+            url: settings.api.host + '/objects/all',
+            headers: {
+                'User-Agent': 'request',
+                'X-Fields':'{"name":"' + pageObject.objectName + '"}'
+            }
+        };
+
+        request(options, function callback(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                var squelette = JSON.parse(body);
+                sendResult(pageObject, squelette);
+            }
+        });
+    }
+
+
+
+    var sendResult = function(pageObject, squelette) {
 
         fields = objectService.getFields(settings, squelette);
         title  = objectService.getObjectName(settings, squelette);
 
         getMenu(menu);
 
-        if (error) {
-            throw error;
+        request(pageObject.reqOptions, function callback(error, response, body) {
+            var sendOject = buildSendObject(pageObject, error, response, body, squelette, menu, title, fields);
+            send(sendOject);
+        });
+    }
+
+    var buildPageObject = function(req, res, reqOptions, renderView, objectName, buildList)
+    {
+        var objectName = typeof objectName !== 'undefined' ? objectName : false;
+        var buildList = typeof buildList !== 'undefined' ? buildList : false;
+
+        var pageObject = {
+            'req' : req,
+            'res' : res,
+            'objectName' : objectName,
+            'reqOptions' : reqOptions,
+            'renderView' : renderView,
+            'buildList'  : buildList
+        }
+
+        return pageObject;
+    }
+
+    var buildSendObject = function(pageObject, error, response, body, squelette, menu, title, fields)
+    {
+        var title  = typeof title !== 'undefined' ? title : '';
+        var fields = typeof fields !== 'undefined' ? fields : [];
+
+        var sendObject = {
+            'res' : pageObject.res,
+            'renderView': pageObject.renderView,
+            'buildList' : pageObject.buildList,
+            'error' : error,
+            'response' : response,
+            'body' : body,
+            'squelette' : squelette,
+            'menu' : menu,
+            'title': title,
+            'fields' : fields
+        }
+
+        return sendObject;
+    }
+
+    var send = function(sendObject) {
+        if (sendObject.error) {
+            throw sendObject.error;
         } else {
-            switch (response.statusCode) {
+            switch (sendObject.response.statusCode) {
                 case 200:
                 case 201:
-                    var body = JSON.parse(body);
-
-                    if (buildList != false) {
-                        body = objectService.buildList(settings, squelette, body);
+                    var jsonBody = JSON.parse(sendObject.body);
+                    if (sendObject.buildList != false) {
+                        body = objectService.buildList(settings, sendObject.squelette, jsonBody);
                     }
-                    res.render(renderView, {
+
+                    sendObject.res.render(sendObject.renderView, {
                         brand: settings.brand,
-                        menu: menu,
-                        title: title,
-                        body : body,
-                        fields: fields
+                        menu: sendObject.menu,
+                        title: sendObject.title,
+                        body : jsonBody,
+                        fields: sendObject.fields
                     });
                     break;
                 case 404:
-                    res.render('index', {
-                        body : body
+                    sendObject.res.render('index', {
+                        body : jsonBody
                     });
                     break;
                 case 500:
-                    res.render('error', {
-                        body : body
+                    sendObject.res.render('error', {
+                        body : jsonBody
                     });
                     break;
             }
         }
-
-    }
+    };
 
 }

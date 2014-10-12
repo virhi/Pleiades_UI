@@ -8,9 +8,7 @@
                 <thead>
                     <tr>
                         {% for fieldName, field in fields %}
-                            {% if field.list %}
-                                <th>{{ fieldName }}</th>
-                            {% endif %}
+                            <th>{{ fieldName }}</th>
                         {% endfor %}
                         <th>action</th>
                     </tr>
@@ -19,9 +17,7 @@
                     {% for object in body %}
                         <tr>
                             {% for fieldName, field in fields %}
-                                {% if field.list %}
-                                    <td>{{ attribute(object, fieldName) }}</td>
-                                {% endif %}
+                                <td>{{ attribute(object, fieldName) }}</td>
                             {% endfor %}
                             <td><a href="{{ object.link.self }}">Voir plus</a></td>
                         </tr>

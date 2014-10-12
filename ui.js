@@ -3,9 +3,6 @@ var express    = require('express');
 var bodyParser = require('body-parser');
 var app        = express();
 
-//var hal     = require("express-hal");
-//app.use(hal.middleware);
-
 app.use(bodyParser());
 
 app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
