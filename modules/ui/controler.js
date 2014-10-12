@@ -14,16 +14,6 @@ module.exports = function(app, settings, callback) {
 
 
     app.get('/', function(req, res){
-        res.render('index', {
-            body : "Hello World"
-        });
-    });
-
-    app.get('/test/:object', function(req, res) {
-        sendPage(req, res, req.params.object, 'index');
-    });
-
-    app.get('/lists', function(req, res){
 
         var reqOptions = {
             url: settings.api.host + '/objects/all',
@@ -63,9 +53,25 @@ module.exports = function(app, settings, callback) {
         sendPage(pageObject);
     });
 
+    app.get(settings.createItemUrl + ':object', function(req, res, next){
+
+        var reqOptions = {
+            method: 'GET',
+            url: settings.api.host + '/' + req.params.object,
+            headers: {
+                'User-Agent': 'request'
+            }
+        };
+
+        var formUrl    = settings.createResultItemUrl + req.params.object;
+        var pageObject = buildPageObject(req, res, reqOptions, 'form', req.params.object, false, formUrl);
+        sendPage(pageObject);
+
+    });
+
     app.get(settings.editItemUrl + ':object/:id', function(req, res, next){
 
-        var options = {
+        var reqOptions = {
             method: 'GET',
             url: settings.api.host + '/' + req.params.object,
             headers: {
@@ -74,70 +80,36 @@ module.exports = function(app, settings, callback) {
             }
         };
 
-        var squelette = {
-            name: 'post',
-            plural: 'posts',
-            model: {
-                fields: {
-                    id          : { type : "serial", key: true, list: true },
-                    title       : { type: "text", list: true },
-                    description : { type: "text", list: true }
-                }
-            },
-            methods : [
-                {name : 'GET'},
-                {name : 'POST'},
-                {name : 'PUT'},
-                {name : 'DELETE'}
-            ]
-        };
+        var formUrl    = settings.editResultItemUrl + req.params.object + '/' + req.params.id;
+        var pageObject = buildPageObject(req, res, reqOptions, 'edit', req.params.object, false, formUrl);
+        sendPage(pageObject);
 
-        request(options, function(error, response, body) {
-            sendResult(req, res, error, response, body, squelette, 'edit');
-        });
     });
 
 
-    app.get('/tag/edit', function(req, res) {
-
-        object = {
-            name: 'tag',
-            plural: 'tags',
-            model: {
-                fields: {
-                    id          : { type : "serial", key: true },
-                    title       : { type: "text", required: true },
-                    description : { type: "text", required: false }
-                }
-            },
-            methods : [
-                {name : 'GET'},
-                {name : 'POST'},
-                {name : 'PUT'},
-                {name : 'DELETE'}
-            ]
-        };
-
+    app.post(settings.editResultItemUrl + ':object/:id', function(req, res) {
         var options = {
-            url: settings.api.host + '/objects/all',
+            method: 'PUT',
+            url: settings.api.host + '/' + req.params.object,
             headers: {
-                'User-Agent': 'request'
-            }
+                'User-Agent': 'request',
+                'Content-Type': 'application/json',
+                'X-Fields': '{"id": ' + req.params.id + '}'
+            },
+            body: JSON.stringify(req.body)
         };
 
         request(options, function callback(error, response, body) {
-            if (!error && response.statusCode == 200) {
-                var info = JSON.parse(body);
-                sendResult(req, res, error, response, body, object, 'form');
-            }
+
+            res.redirect(settings.viewItemUrl + req.params.object + '/' + req.params.id);
+
         });
     });
 
-    app.post('/toto/edit', function(req, res) {
-
+    app.post(settings.createResultItemUrl + ':object', function(req, res) {
         var options = {
             method: 'POST',
-            url: settings.api.host + '/tag',
+            url: settings.api.host + '/' + req.params.object,
             headers: {
                 'User-Agent': 'request',
                 'Content-Type': 'application/json'
@@ -146,8 +118,27 @@ module.exports = function(app, settings, callback) {
         };
 
         request(options, function callback(error, response, body) {
-            console.log(response.statusCode);
-            sendResult(req, res, error, response, body, object, 'index');
+            var createObject = JSON.parse(body);
+            res.redirect(settings.viewItemUrl + req.params.object + '/' + createObject[0].id);
+        });
+    });
+
+    app.post(settings.editResultItemUrl + ':object/:id', function(req, res) {
+        var options = {
+            method: 'PUT',
+            url: settings.api.host + '/' + req.params.object,
+            headers: {
+                'User-Agent': 'request',
+                'Content-Type': 'application/json',
+                'X-Fields': '{"id": ' + req.params.id + '}'
+            },
+            body: JSON.stringify(req.body)
+        };
+
+        request(options, function callback(error, response, body) {
+
+            res.redirect(settings.viewItemUrl + req.params.object + '/' + req.params.id);
+
         });
     });
 
@@ -181,12 +172,12 @@ module.exports = function(app, settings, callback) {
 
     var sendPage = function(pageObject) {
 
-        if (pageObject.objectName != false) {
+        if (pageObject.pageInfo.objectName != false) {
             var options = {
                 url: settings.api.host + '/objects/all',
                 headers: {
                     'User-Agent': 'request',
-                    'X-Fields': '{"name":"' + pageObject.objectName + '"}'
+                    'X-Fields': '{"name":"' + pageObject.pageInfo.objectName + '"}'
                 }
             };
 
@@ -201,8 +192,6 @@ module.exports = function(app, settings, callback) {
         }
     }
 
-
-
     var sendResult = function(pageObject, squelette) {
 
         var fields = [];
@@ -216,25 +205,29 @@ module.exports = function(app, settings, callback) {
         getMenu(menu);
 
 
-        request(pageObject.reqOptions, function callback(error, response, body) {
+        request(pageObject.pageInfo.reqOptions, function callback(error, response, body) {
 
             var sendOject = buildSendObject(pageObject, error, response, body, squelette, menu, title, fields);
             send(sendOject);
         });
     }
 
-    var buildPageObject = function(req, res, reqOptions, renderView, objectName, buildList)
+    var buildPageObject = function(req, res, reqOptions, renderView, objectName, buildList, urlForm)
     {
         var objectName = typeof objectName !== 'undefined' ? objectName : false;
-        var buildList = typeof buildList !== 'undefined' ? buildList : false;
+        var buildList  = typeof buildList !== 'undefined' ? buildList : false;
+        var urlForm    = typeof urlForm !== 'undefined' ? urlForm : false;
 
         var pageObject = {
             'req' : req,
             'res' : res,
-            'objectName' : objectName,
-            'reqOptions' : reqOptions,
-            'renderView' : renderView,
-            'buildList'  : buildList
+            'pageInfo' : {
+                'reqOptions' : reqOptions,
+                'renderView' : renderView,
+                'buildList'  : buildList,
+                'objectName' : objectName,
+                'urlForm' : urlForm
+            }
         }
 
         return pageObject;
@@ -247,8 +240,10 @@ module.exports = function(app, settings, callback) {
 
         var sendObject = {
             'res' : pageObject.res,
-            'renderView': pageObject.renderView,
-            'buildList' : pageObject.buildList,
+            'renderView': pageObject.pageInfo.renderView,
+            'buildList' : pageObject.pageInfo.buildList,
+            'urlForm' : pageObject.pageInfo.urlForm,
+            'objectName' : pageObject.pageInfo.objectName,
             'error' : error,
             'response' : response,
             'body' : body,
@@ -274,11 +269,13 @@ module.exports = function(app, settings, callback) {
                     }
 
                     sendObject.res.render(sendObject.renderView, {
-                        brand: settings.brand,
+                        settings: settings,
                         menu: sendObject.menu,
                         title: sendObject.title,
+                        objectName: sendObject.objectName,
                         body : jsonBody,
-                        fields: sendObject.fields
+                        fields: sendObject.fields,
+                        urlForm: sendObject.urlForm
                     });
                     break;
                 case 404:

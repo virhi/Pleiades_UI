@@ -1,5 +1,16 @@
 {% extends "layout.twig" %}
 
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        {% for item in menu %}
+            {% if item.name == title %}
+                <li><a href="{{ item.url }}">{{ item.name }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+{% endblock %}
+
 {% block content %}
     Voici mon message :
 

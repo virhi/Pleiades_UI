@@ -15,6 +15,9 @@ var defaultSettings = {
     },
     viewItemUrl: "/item/",
     editItemUrl: "/edit/",
+    createItemUrl: "/create/",
+    editResultItemUrl: "/edit_result/",
+    createResultItemUrl: "/create_result/",
     squeleteFields: 'model.fields',
     squeleteName: 'name'
 };

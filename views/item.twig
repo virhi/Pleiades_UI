@@ -1,25 +1,43 @@
 {% extends "layout.twig" %}
 
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        {% for item in menu %}
+            {% if item.name == title %}
+                <li><a href="{{ item.url }}">{{ item.name }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+{% endblock %}
+
 {% block content %}
 
+    {% for object in body %}
         <div class="panel panel-default">
             <div class="panel-heading">{{ title | title }}</div>
             <div class="panel-body">
-                {% for object in body %}
-                    <form class="form-horizontal" role="form">
-                        <fieldset disabled>
-                            {% for fieldName, field in fields %}
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label" for="{{ fieldName }}">{{ fieldName }} :</label>
-                                    <div class="col-sm-10">
-                                        <input type="{{ field.type }}" class="form-control" id="{{ fieldName }}" placeholder="{{ attribute(object, fieldName) }}" value="{{ attribute(object, fieldName) }}">
-                                    </div>
+                <form class="form-horizontal" role="form">
+                    <fieldset disabled>
+                        {% for fieldName, field in fields %}
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="{{ fieldName }}">{{ fieldName }} :</label>
+                                <div class="col-sm-10">
+                                    <input type="{{ field.type }}" class="form-control" id="{{ fieldName }}" placeholder="{{ attribute(object, fieldName) }}" value="{{ attribute(object, fieldName) }}">
                                 </div>
-                            {% endfor %}
-                        </fieldset>
-                    </form>
-                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </fieldset>
+                    <div class="form-group text-right">
+                        <div class="col-sm-8">
+                        </div>
+                        <div class="col-sm-4 ">
+                            <a href="{{ [settings.editItemUrl, objectName,'/',object.id]|join }}" class="btn btn-primary">Edit</a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
+    {% endfor %}
 
 {% endblock %}

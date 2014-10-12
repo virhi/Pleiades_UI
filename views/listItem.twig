@@ -1,6 +1,21 @@
 {% extends "layout.twig" %}
 
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        {% for item in menu %}
+            {% if item.name == title %}
+                <li><a href="{{ item.url }}">{{ item.name }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+{% endblock %}
+
 {% block content %}
+    <p class="text-right">
+        <a href="{{ [settings.createItemUrl, objectName]|join }}" class="btn btn-primary btn-lg">Create</a>
+    </p>
+
     <!-- Table -->
     <div class="panel panel-default">
         <div class="table-responsive">
@@ -8,9 +23,9 @@
                 <thead>
                     <tr>
                         {% for fieldName, field in fields %}
-                            <th>{{ fieldName }}</th>
+                            <th>{{ fieldName }} :</th>
                         {% endfor %}
-                        <th>action</th>
+                        <th>action :</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -19,7 +34,10 @@
                             {% for fieldName, field in fields %}
                                 <td>{{ attribute(object, fieldName) }}</td>
                             {% endfor %}
-                            <td><a href="{{ object.link.self }}">Voir plus</a></td>
+                            <td class="text-center">
+                                <a href="{{ [settings.viewItemUrl, objectName,'/',object.id]|join }}" class="btn btn-primary">View</a>
+                                <a href="{{ [settings.editItemUrl, objectName,'/',object.id]|join }}" class="btn btn-primary">Edit</a>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
