@@ -25,17 +25,15 @@ module.exports = function(app, settings, callback) {
 
     app.get('/lists', function(req, res){
 
-        var options = {
+        var reqOptions = {
             url: settings.api.host + '/objects/all',
             headers: {
                 'User-Agent': 'request'
             }
         };
 
-
-        request(options, function(error, response, body){
-            sendResult(req, res, error, response, body, {}, 'list');
-        });
+        var pageObject = buildPageObject(req, res, reqOptions, 'list', false);
+        sendPage(pageObject);
     });
 
     app.get('/list/:object', function(req, res, next) {
@@ -183,32 +181,43 @@ module.exports = function(app, settings, callback) {
 
     var sendPage = function(pageObject) {
 
-        var options = {
-            url: settings.api.host + '/objects/all',
-            headers: {
-                'User-Agent': 'request',
-                'X-Fields':'{"name":"' + pageObject.objectName + '"}'
-            }
-        };
+        if (pageObject.objectName != false) {
+            var options = {
+                url: settings.api.host + '/objects/all',
+                headers: {
+                    'User-Agent': 'request',
+                    'X-Fields': '{"name":"' + pageObject.objectName + '"}'
+                }
+            };
 
-        request(options, function callback(error, response, body) {
-            if (!error && response.statusCode == 200) {
-                var squelette = JSON.parse(body);
-                sendResult(pageObject, squelette);
-            }
-        });
+            request(options, function callback(error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    var squelette = JSON.parse(body);
+                    sendResult(pageObject, squelette);
+                }
+            });
+        } else {
+            sendResult(pageObject, false);
+        }
     }
 
 
 
     var sendResult = function(pageObject, squelette) {
 
-        fields = objectService.getFields(settings, squelette);
-        title  = objectService.getObjectName(settings, squelette);
+        var fields = [];
+        var title  = '';
+
+        if (squelette != false) {
+            fields = objectService.getFields(settings, squelette);
+            title  = objectService.getObjectName(settings, squelette);
+        }
 
         getMenu(menu);
 
+
         request(pageObject.reqOptions, function callback(error, response, body) {
+
             var sendOject = buildSendObject(pageObject, error, response, body, squelette, menu, title, fields);
             send(sendOject);
         });
