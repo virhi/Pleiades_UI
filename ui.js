@@ -19,6 +19,7 @@ var defaultSettings = {
     editResultItemUrl: "/edit_result/",
     createResultItemUrl: "/create_result/",
     squeleteFields: 'model.fields',
+    squeleteHasmany: 'model.hasMany',
     squeleteName: 'name'
 };
 

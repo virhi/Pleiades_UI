@@ -195,19 +195,22 @@ module.exports = function(app, settings, callback) {
     var sendResult = function(pageObject, squelette) {
 
         var fields = [];
+        var collections = [];
         var title  = '';
 
         if (squelette != false) {
             fields = objectService.getFields(settings, squelette);
+            collections = objectService.getCollections(settings, squelette);
             title  = objectService.getObjectName(settings, squelette);
         }
 
         getMenu(menu);
 
+        console.log(collections);
 
         request(pageObject.pageInfo.reqOptions, function callback(error, response, body) {
 
-            var sendOject = buildSendObject(pageObject, error, response, body, squelette, menu, title, fields);
+            var sendOject = buildSendObject(pageObject, error, response, body, squelette, menu, title, fields, collections);
             send(sendOject);
         });
     }
@@ -233,10 +236,11 @@ module.exports = function(app, settings, callback) {
         return pageObject;
     }
 
-    var buildSendObject = function(pageObject, error, response, body, squelette, menu, title, fields)
+    var buildSendObject = function(pageObject, error, response, body, squelette, menu, title, fields, collections)
     {
         var title  = typeof title !== 'undefined' ? title : '';
         var fields = typeof fields !== 'undefined' ? fields : [];
+        var collections = typeof collections !== 'undefined' ? collections : [];
 
         var sendObject = {
             'res' : pageObject.res,
@@ -250,7 +254,8 @@ module.exports = function(app, settings, callback) {
             'squelette' : squelette,
             'menu' : menu,
             'title': title,
-            'fields' : fields
+            'fields' : fields,
+            'collections' : collections
         }
 
         return sendObject;
@@ -268,14 +273,19 @@ module.exports = function(app, settings, callback) {
                         body = objectService.buildList(settings, sendObject.squelette, jsonBody);
                     }
 
-                    sendObject.res.render(sendObject.renderView, {
+                    var page = {
                         settings: settings,
                         menu: sendObject.menu,
                         title: sendObject.title,
                         objectName: sendObject.objectName,
                         body : jsonBody,
                         fields: sendObject.fields,
-                        urlForm: sendObject.urlForm
+                        urlForm: sendObject.urlForm,
+                        collections : sendObject.collections
+                    }
+
+                    sendObject.res.render(sendObject.renderView, {
+                        page: page
                     });
                     break;
                 case 404:

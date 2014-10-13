@@ -3,8 +3,8 @@
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
-        {% for item in menu %}
-            {% if item.name == title %}
+        {% for item in page.menu %}
+            {% if item.name == page.title %}
                 <li><a href="{{ item.url }}">{{ item.name }}</a></li>
             {% endif %}
         {% endfor %}
@@ -14,7 +14,7 @@
 {% block content %}
     Voici mon message :
 
-    {% for object in body %}
+    {% for object in page.body %}
         {{ object.name }}
     {% endfor %}
 

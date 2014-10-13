@@ -3,8 +3,8 @@
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
-        {% for item in menu %}
-            {% if item.name == title %}
+        {% for item in page.menu %}
+            {% if item.name == page.title %}
                 <li><a href="{{ item.url }}">{{ item.name }}</a></li>
             {% endif %}
         {% endfor %}
@@ -12,22 +12,14 @@
 {% endblock %}
 
 {% block content %}
-    <h1> form : {{ title }} </h1>
 
-    <form class="form-horizontal" role="form" method="post" action="{{ [settings.createResultItemUrl, objectName]|join }}">
-        {% for fieldName, field in fields %}
-            {% if field.key is defined and field.key == true %}
-                <div class="form-group">
-                    <label for="{{ fieldName }}">{{ fieldName }}</label>
-                    <input type="{{ field.type }}" name="{{ fieldName }}" disabled class="form-control" id="{{ fieldName }}" placeholder="{{ fieldName }}">
-                </div>
-            {% else %}
-                <div class="form-group">
-                    <label for="{{ fieldName }}">{{ fieldName }}</label>
-                    <input type="{{ field.type }}" name="{{ fieldName }}" class="form-control" id="{{ fieldName }}" placeholder="{{ fieldName }}" {% if field.required %} required {% endif %}>
-                </div>
-            {% endif %}
+    <h1> form : {{ page.title }} </h1>
+    <form class="form-horizontal" role="form" method="post" action="{{ [page.settings.createResultItemUrl, page.objectName]|join }}">
+        {% for fieldName, field in page.fields %}
+            {% set fieldValue = '' %}
+            {% include "fields/field.twig"%}
         {% endfor %}
+
         <div class="form-group text-right">
             <div class="col-sm-8">
             </div>

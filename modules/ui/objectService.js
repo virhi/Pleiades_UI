@@ -4,6 +4,28 @@ var request = require('request');
 var objectService = {
 
     /* get fields for object description */
+    getCollections: function(settings, squelette) {
+        var result     = null;
+        var tmpFields  = squelette;
+        var fieldsPath = settings.squeleteHasmany.split('.');
+
+        function getIndex(field, index) {
+            if (tmpFields.hasOwnProperty(field)) {
+                tmpFields  = tmpFields[field];
+                return true;
+            } else {
+                tmpFields = null;
+                return false;
+            }
+        }
+
+        fieldsPath.every(getIndex);
+
+        result = tmpFields;
+        return result;
+    },
+
+    /* get fields for object description */
     getFields: function(settings, squelette) {
         var result     = null;
         var tmpFields  = squelette;

@@ -3,8 +3,8 @@
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
-        {% for item in menu %}
-            {% if item.name == title %}
+        {% for item in page.menu %}
+            {% if item.name == page.title %}
                 <li><a href="{{ item.url }}">{{ item.name }}</a></li>
             {% endif %}
         {% endfor %}
@@ -13,7 +13,7 @@
 
 {% block content %}
     <p class="text-right">
-        <a href="{{ [settings.createItemUrl, objectName]|join }}" class="btn btn-primary btn-lg">Create</a>
+        <a href="{{ [page.settings.createItemUrl, page.objectName]|join }}" class="btn btn-primary btn-lg">Create</a>
     </p>
 
     <!-- Table -->
@@ -22,21 +22,21 @@
             <table class="table table-striped table-hover table-bordered">
                 <thead>
                     <tr>
-                        {% for fieldName, field in fields %}
+                        {% for fieldName, field in page.fields %}
                             <th>{{ fieldName }} :</th>
                         {% endfor %}
                         <th>action :</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for object in body %}
+                    {% for object in page.body %}
                         <tr>
-                            {% for fieldName, field in fields %}
+                            {% for fieldName, field in page.fields %}
                                 <td>{{ attribute(object, fieldName) }}</td>
                             {% endfor %}
                             <td class="text-center">
-                                <a href="{{ [settings.viewItemUrl, objectName,'/',object.id]|join }}" class="btn btn-primary">View</a>
-                                <a href="{{ [settings.editItemUrl, objectName,'/',object.id]|join }}" class="btn btn-primary">Edit</a>
+                                <a href="{{ [page.settings.viewItemUrl, page.objectName,'/',object.id]|join }}" class="btn btn-primary">View</a>
+                                <a href="{{ [page.settings.editItemUrl, page.objectName,'/',object.id]|join }}" class="btn btn-primary">Edit</a>
                             </td>
                         </tr>
                     {% endfor %}
