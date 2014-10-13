@@ -10,20 +10,21 @@ var objectService = {
 
         var targetObjectsNameTmp = '';
 
+        if (Array.isArray(collections)) {
+            for (collectionsCompteur = 0; collectionsCompteur < collections.length; collectionsCompteur++) {
+                var targetObjectsNameTmp =  collections[collectionsCompteur].targetObject;
+                for (modelsCompteur = 0; modelsCompteur < models.length; modelsCompteur++) {
+                    if (models[modelsCompteur].name == targetObjectsNameTmp) {
+                        var tmpListField = models[modelsCompteur].model.fields;
 
-        for (collectionsCompteur = 0; collectionsCompteur < collections.length; collectionsCompteur++) {
-            var targetObjectsNameTmp =  collections[collectionsCompteur].targetObject;
-            for (modelsCompteur = 0; modelsCompteur < models.length; modelsCompteur++) {
-                if (models[modelsCompteur].name == targetObjectsNameTmp) {
-                    var tmpListField = models[modelsCompteur].model.fields;
-
-                    for (field in tmpListField) {
-                        if (tmpListField[field].hasOwnProperty('key') && tmpListField[field].key == true) {
-                            var tpmObject = {
-                                name: collections[collectionsCompteur].fieldName,
-                                field: tmpListField[field].name
+                        for (field in tmpListField) {
+                            if (tmpListField[field].hasOwnProperty('key') && tmpListField[field].key == true) {
+                                var tpmObject = {
+                                    name: collections[collectionsCompteur].fieldName,
+                                    field: tmpListField[field].name
+                                }
+                                tmpEmbedFields.push(tpmObject);
                             }
-                            tmpEmbedFields.push(tpmObject);
                         }
                     }
                 }

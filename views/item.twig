@@ -22,6 +22,9 @@
                             {% set fieldValue =  attribute(object, fieldName) %}
                             {% include "fields/field.twig" %}
                         {% endfor %}
+                        {% for field in page.embedFields %}
+                            {% include "fields/select.twig" %}
+                        {% endfor %}
                     </fieldset>
                     <div class="form-group text-right">
                         <div class="col-sm-8">

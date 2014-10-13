@@ -1,0 +1,12 @@
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="{{ field.name }}">{{ field.name }} :</label>
+    <div class="col-sm-10">
+        <select multiple>
+            {% set embedField = attribute(object, field.name) %}
+            {% for ef in embedField %}
+                <option value="{{ attribute(ef, field.field) }}">{{ attribute(ef, field.field) }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
