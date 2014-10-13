@@ -3,6 +3,37 @@ var request = require('request');
 
 var objectService = {
 
+    getEmbedFields: function (settings, sendObject) {
+        var collections = sendObject.collections;
+        var models = sendObject.models;
+        var tmpEmbedFields = [];
+
+        var targetObjectsNameTmp = '';
+
+
+        for (collectionsCompteur = 0; collectionsCompteur < collections.length; collectionsCompteur++) {
+            var targetObjectsNameTmp =  collections[collectionsCompteur].targetObject;
+            for (modelsCompteur = 0; modelsCompteur < models.length; modelsCompteur++) {
+                if (models[modelsCompteur].name == targetObjectsNameTmp) {
+                    var tmpListField = models[modelsCompteur].model.fields;
+
+                    for (field in tmpListField) {
+                        if (tmpListField[field].hasOwnProperty('key') && tmpListField[field].key == true) {
+                            var tpmObject = {
+                                name: collections[collectionsCompteur].fieldName,
+                                field: tmpListField[field].name
+                            }
+                            tmpEmbedFields.push(tpmObject);
+                        }
+                    }
+                }
+            }
+        }
+
+        return tmpEmbedFields;
+
+    },
+
     /* get fields for object description */
     getCollections: function(settings, squelette) {
         var result     = null;

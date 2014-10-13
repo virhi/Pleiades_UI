@@ -172,27 +172,42 @@ module.exports = function(app, settings, callback) {
 
     var sendPage = function(pageObject) {
 
-        if (pageObject.pageInfo.objectName != false) {
-            var options = {
-                url: settings.api.host + '/objects/all',
-                headers: {
-                    'User-Agent': 'request',
-                    'X-Fields': '{"name":"' + pageObject.pageInfo.objectName + '"}'
-                }
-            };
+        var structureOptions = {
+            url: settings.api.host + '/objects/all',
+            headers: {
+                'User-Agent': 'request'
+            }
+        };
 
-            request(options, function callback(error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    var squelette = JSON.parse(body);
-                    sendResult(pageObject, squelette);
+        request(structureOptions, function callback(structureError, structureResponse, structurebody) {
+            if (!structureError && structureResponse.statusCode == 200) {
+
+                var models = JSON.parse(structurebody);
+
+                if (pageObject.pageInfo.objectName != false) {
+                    var options = {
+                        url: settings.api.host + '/objects/all',
+                        headers: {
+                            'User-Agent': 'request',
+                            'X-Fields': '{"name":"' + pageObject.pageInfo.objectName + '"}'
+                        }
+                    };
+
+                    request(options, function callback(error, response, body) {
+                        if (!error && response.statusCode == 200) {
+                            var squelette = JSON.parse(body);
+                            sendResult(pageObject, squelette, models);
+                        }
+                    });
+                } else {
+                    sendResult(pageObject, false);
                 }
-            });
-        } else {
-            sendResult(pageObject, false);
-        }
+
+            }
+        });
     }
 
-    var sendResult = function(pageObject, squelette) {
+    var sendResult = function(pageObject, squelette, models) {
 
         var fields = [];
         var collections = [];
@@ -206,11 +221,9 @@ module.exports = function(app, settings, callback) {
 
         getMenu(menu);
 
-        console.log(collections);
-
         request(pageObject.pageInfo.reqOptions, function callback(error, response, body) {
 
-            var sendOject = buildSendObject(pageObject, error, response, body, squelette, menu, title, fields, collections);
+            var sendOject = buildSendObject(pageObject, error, response, body, squelette, models, menu, title, fields, collections);
             send(sendOject);
         });
     }
@@ -236,7 +249,7 @@ module.exports = function(app, settings, callback) {
         return pageObject;
     }
 
-    var buildSendObject = function(pageObject, error, response, body, squelette, menu, title, fields, collections)
+    var buildSendObject = function(pageObject, error, response, body, squelette, models, menu, title, fields, collections)
     {
         var title  = typeof title !== 'undefined' ? title : '';
         var fields = typeof fields !== 'undefined' ? fields : [];
@@ -255,7 +268,8 @@ module.exports = function(app, settings, callback) {
             'menu' : menu,
             'title': title,
             'fields' : fields,
-            'collections' : collections
+            'collections' : collections,
+            'models' : models
         }
 
         return sendObject;
@@ -273,13 +287,17 @@ module.exports = function(app, settings, callback) {
                         body = objectService.buildList(settings, sendObject.squelette, jsonBody);
                     }
 
+                    var embedFields = objectService.getEmbedFields(settings, sendObject);
+
                     var page = {
                         settings: settings,
                         menu: sendObject.menu,
                         title: sendObject.title,
                         objectName: sendObject.objectName,
+                        models: sendObject.models,
                         body : jsonBody,
                         fields: sendObject.fields,
+                        embedFields: embedFields,
                         urlForm: sendObject.urlForm,
                         collections : sendObject.collections
                     }

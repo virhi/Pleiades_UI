@@ -12,6 +12,7 @@
 {% endblock %}
 
 {% block content %}
+
     <p class="text-right">
         <a href="{{ [page.settings.createItemUrl, page.objectName]|join }}" class="btn btn-primary btn-lg">Create</a>
     </p>
@@ -25,6 +26,9 @@
                         {% for fieldName, field in page.fields %}
                             <th>{{ fieldName }} :</th>
                         {% endfor %}
+                        {% for field in page.embedFields %}
+                            <th>{{ field.name }} :</th>
+                        {% endfor %}
                         <th>action :</th>
                     </tr>
                 </thead>
@@ -33,6 +37,14 @@
                         <tr>
                             {% for fieldName, field in page.fields %}
                                 <td>{{ attribute(object, fieldName) }}</td>
+                            {% endfor %}
+                            {% for field in page.embedFields %}
+                                {% set embedField = attribute(object, field.name) %}
+                                <td>
+                                {% for ef in embedField %}
+                                    {{ attribute(ef, field.field) }}
+                                {% endfor %}
+                                </td>
                             {% endfor %}
                             <td class="text-center">
                                 <a href="{{ [page.settings.viewItemUrl, page.objectName,'/',object.id]|join }}" class="btn btn-primary">View</a>
