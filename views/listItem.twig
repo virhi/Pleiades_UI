@@ -3,8 +3,8 @@
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
-        {% for item in page.menu %}
-            {% if item.name == page.title %}
+        {% for item in list.menu %}
+            {% if item.name == list.objectName %}
                 <li><a href="{{ item.url }}">{{ item.name }}</a></li>
             {% endif %}
         {% endfor %}
@@ -14,7 +14,7 @@
 {% block content %}
 
     <p class="text-right">
-        <a href="{{ [page.settings.createItemUrl, page.objectName]|join }}" class="btn btn-primary btn-lg">Create</a>
+        <a href="{{ [list.settings.createItemUrl, list.objectName]|join }}" class="btn btn-primary btn-lg">Create</a>
     </p>
 
     <!-- Table -->
@@ -22,36 +22,36 @@
         <div class="table-responsive">
             <table class="table table-striped table-hover table-bordered">
                 <thead>
-                    <tr>
-                        {% for fieldName, field in page.fields %}
-                            <th>{{ fieldName }} :</th>
-                        {% endfor %}
-                        {% for field in page.embedFields %}
-                            <th>{{ field.name }} :</th>
-                        {% endfor %}
-                        <th>action :</th>
-                    </tr>
+                <tr>
+                    {% for fieldName, field in list.fields %}
+                        <th>{{ fieldName }} :</th>
+                    {% endfor %}
+                    {% for field in list.embedFields %}
+                        <th>{{ field.name }} :</th>
+                    {% endfor %}
+                    <th>action :</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {% for object in page.body %}
-                        <tr>
-                            {% for fieldName, field in page.fields %}
-                                <td>{{ attribute(object, fieldName) }}</td>
-                            {% endfor %}
-                            {% for field in page.embedFields %}
-                                {% set embedField = attribute(object, field.name) %}
-                                <td>
+                {% for object in list.listObject %}
+                    <tr>
+                        {% for fieldName, field in list.fields %}
+                            <td>{{ attribute(object, fieldName) }}</td>
+                        {% endfor %}
+                        {% for field in list.embedFields %}
+                            {% set embedField = attribute(object, field.name) %}
+                            <td>
                                 {% for ef in embedField %}
                                     {{ attribute(ef, field.field) }}
                                 {% endfor %}
-                                </td>
-                            {% endfor %}
-                            <td class="text-center">
-                                <a href="{{ [page.settings.viewItemUrl, page.objectName,'/',object.id]|join }}" class="btn btn-primary">View</a>
-                                <a href="{{ [page.settings.editItemUrl, page.objectName,'/',object.id]|join }}" class="btn btn-primary">Edit</a>
                             </td>
-                        </tr>
-                    {% endfor %}
+                        {% endfor %}
+                        <td class="text-center">
+                            <a href="{{ [list.settings.viewItemUrl, list.objectName,'/',object.id]|join }}" class="btn btn-primary">View</a>
+                            <a href="{{ [list.settings.editItemUrl, list.objectName,'/',object.id]|join }}" class="btn btn-primary">Edit</a>
+                        </td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>

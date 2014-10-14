@@ -12,48 +12,30 @@
 {% endblock %}
 
 {% block content %}
-
-    <p class="text-right">
-        <a href="{{ [list.settings.createItemUrl, list.objectName]|join }}" class="btn btn-primary btn-lg">Create</a>
-    </p>
-
-    <!-- Table -->
-    <div class="panel panel-default">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover table-bordered">
-                <thead>
-                <tr>
-                    {% for fieldName, field in list.fields %}
-                        <th>{{ fieldName }} :</th>
-                    {% endfor %}
-                    {% for field in list.embedFields %}
-                        <th>{{ field.name }} :</th>
-                    {% endfor %}
-                    <th>action :</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for object in list.listObject %}
-                    <tr>
+    {% for object in list.object %}
+        <div class="panel panel-default">
+            <div class="panel-heading">{{ list.title | title }}</div>
+            <div class="panel-body">
+                <form class="form-horizontal" role="form">
+                    <fieldset disabled>
                         {% for fieldName, field in list.fields %}
-                            <td>{{ attribute(object, fieldName) }}</td>
+                            {% set fieldValue =  attribute(object, fieldName) %}
+                            {% include "fields/field.twig" %}
                         {% endfor %}
                         {% for field in list.embedFields %}
-                            {% set embedField = attribute(object, field.name) %}
-                            <td>
-                                {% for ef in embedField %}
-                                    {{ attribute(ef, field.field) }}
-                                {% endfor %}
-                            </td>
+                            {% include "fields/select.twig" %}
                         {% endfor %}
-                        <td class="text-center">
-                            <a href="{{ [list.settings.viewItemUrl, list.objectName,'/',object.id]|join }}" class="btn btn-primary">View</a>
+                    </fieldset>
+                    <div class="form-group text-right">
+                        <div class="col-sm-8">
+                        </div>
+                        <div class="col-sm-4 ">
                             <a href="{{ [list.settings.editItemUrl, list.objectName,'/',object.id]|join }}" class="btn btn-primary">Edit</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    {% endfor %}
+
 {% endblock %}

@@ -3,8 +3,8 @@
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
-        {% for item in page.menu %}
-            {% if item.name == page.title %}
+        {% for item in list.menu %}
+            {% if item.name == list.objectName %}
                 <li><a href="{{ item.url }}">{{ item.name }}</a></li>
             {% endif %}
         {% endfor %}
@@ -12,27 +12,23 @@
 {% endblock %}
 
 {% block content %}
-
-    {% for fieldName, field in page.fields %}
-        {{ dump(field) }}
-    {% endfor %}
     <div class="panel panel-default">
-        <div class="panel-heading">{{ page.title | title }}</div>
+        <div class="panel-heading">{{ list.objectName | title }}</div>
         <div class="panel-body">
-            {% for object in page.body %}
-                <form class="form-horizontal" role="form" method="post" action="{{ page.urlForm }}">
-                    {% for fieldName, field in page.fields %}
+            {% for object in list.object %}
+                <form class="form-horizontal" role="form" method="post" action="{{ [list.settings.editResultItemUrl, list.objectName, '/', object.id]|join }}">
+                    {% for fieldName, field in list.fields %}
                         {% set fieldValue =  attribute(object, fieldName) %}
                         {% include "fields/field.twig" %}
                     {% endfor %}
-                    {% for field in page.embedFields %}
+                    {% for field in list.embedFields %}
                         {% include "fields/select.twig" %}
                     {% endfor %}
                     <div class="form-group text-right">
                         <div class="col-sm-8">
                         </div>
                         <div class="col-sm-4 ">
-                            <a href="{{ [page.settings.viewItemUrl, page.objectName,'/',object.id]|join }}" class="btn btn-default">Cancel</a>
+                            <a href="{{ [list.settings.viewItemUrl, list.objectName,'/',object.id]|join }}" class="btn btn-default">Cancel</a>
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </div>

@@ -3,8 +3,8 @@
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
-        {% for item in page.menu %}
-            {% if item.name == page.title %}
+        {% for item in list.menu %}
+            {% if item.name == list.objectName %}
                 <li><a href="{{ item.url }}">{{ item.name }}</a></li>
             {% endif %}
         {% endfor %}
@@ -13,13 +13,13 @@
 
 {% block content %}
 
-    <h1> form : {{ page.title }} </h1>
-    <form class="form-horizontal" role="form" method="post" action="{{ [page.settings.createResultItemUrl, page.objectName]|join }}">
-        {% for fieldName, field in page.fields %}
+    <h1> form : {{ list.objectName }} </h1>
+    <form class="form-horizontal" role="form" method="post" action="{{ [list.settings.createResultItemUrl, list.objectName]|join }}">
+        {% for fieldName, field in list.fields %}
             {% set fieldValue = '' %}
             {% include "fields/field.twig"%}
         {% endfor %}
-        {% for field in page.embedFields %}
+        {% for field in list.embedFields %}
             {% include "fields/select.twig" %}
         {% endfor %}
         <div class="form-group text-right">
