@@ -4,7 +4,7 @@ module.exports = function(app, settings, callback) {
 
     var request       = require('request');
     var twig          = require('twig');
-    var objectService = require(__dirname + '/objectService.js');
+    var pageService   = require(__dirname + '/page.js');
     var RSVP          = require('rsvp');
     var menu          = [];
 
@@ -12,294 +12,6 @@ module.exports = function(app, settings, callback) {
     app.set('view engine', 'twig');
     app.engine('twig', twig.__express);
 
-    var getListPage = function (page, listFilter) {
-
-        var list = {};
-        list['objectName'] = listFilter.type;
-        list['settings']   = settings;
-
-        objectService.getStructurePromise(settings).then(function(structure) {
-            list['structure'] = structure;
-
-            return structure;
-
-        }, function(value) {
-            page.res.render('test', {
-                page: 'sa a echoué 1',
-                list: list
-            });
-        }).then(function(structure) {
-
-            objectService.getMenuP(structure, listFilter.type).then(function(menu) {
-                list['menu'] = menu;
-
-                objectService.getListObject(settings, listFilter).then(function(listObject) {
-                    list['listObject'] = listObject;
-                    objectService.getCollectionsPromise(settings, list.structure, listFilter.type).then(function(collection) {
-                        list['collection'] = collection;
-
-                        objectService.getEmbedFieldsPromise(settings, collection, structure).then(function(embedFields) {
-                            list['embedFields'] = embedFields;
-
-                            objectService.getFieldsPromise(settings, structure, listFilter.type).then(function(fields) {
-                                list['fields'] = fields;
-                                page.res.render('listItem', {
-                                    page: 'yooo fields 1',
-                                    list: list
-                                });
-                            }, function(error){
-                                page.res.render('error', {
-                                    error: 'fields error 1',
-                                    list: list
-                                });
-                            });
-                        }, function(error) {
-                            page.res.render('error', {
-                                error: 'embedFields error 1',
-                                list: list
-                            });
-                        });
-                    }, function(error){
-
-                        page.res.render('error', {
-                            error: 'collection error 1',
-                            list: list
-                        });
-                    });
-
-                },function(error) {
-                    page.res.render('error', {
-                        error: 'erreur list 1',
-                        list: list
-                    });
-                });
-
-            }, function(error){
-                page.res.render('error', {
-                    error: 'erreur menu 1',
-                    list: list
-                });
-            })
-
-        }).catch(function(error) {
-            console.log('exption');
-        });
-    };
-
-
-    var getPageItem = function (page, filter) {
-
-        var list = {};
-        list['objectName'] = filter.type;
-        list['settings']   = settings;
-
-        objectService.getStructurePromise(settings).then(function(structure) {
-            list['structure'] = structure;
-
-            return structure;
-
-        }, function(value) {
-            page.res.render('test', {
-                page: 'sa a echoué 1',
-                list: list
-            });
-        }).then(function(structure) {
-
-            objectService.getMenuP(structure, filter.type).then(function(menu) {
-                list['menu'] = menu;
-
-                objectService.getObject(settings, filter).then(function(object) {
-                    list['object'] = object;
-                    objectService.getCollectionsPromise(settings, list.structure, filter.type).then(function(collection) {
-                        list['collection'] = collection;
-
-                        objectService.getEmbedFieldsPromise(settings, collection, structure).then(function(embedFields) {
-                            list['embedFields'] = embedFields;
-
-                            objectService.getFieldsPromise(settings, structure, filter.type).then(function(fields) {
-                                list['fields'] = fields;
-                                page.res.render('item', {
-                                    page: 'yooo fields 1',
-                                    list: list
-                                });
-                            }, function(error){
-                                page.res.render('error', {
-                                    error: 'fields error 1',
-                                    list: list
-                                });
-                            });
-                        }, function(error) {
-                            page.res.render('error', {
-                                error: 'embedFields error 1',
-                                list: list
-                            });
-                        });
-                    }, function(error){
-
-                        page.res.render('error', {
-                            error: 'collection error 1',
-                            list: list
-                        });
-                    });
-
-                },function(error) {
-                    console.log(error);
-                    error.res.render('error', {
-                        page: 'erreur list 1',
-                        list: list
-                    });
-                });
-
-            }, function(error){
-                error.res.render('error', {
-                    page: 'erreur menu 1',
-                    list: list
-                });
-            })
-
-        }).catch(function(error) {
-            console.log('exption');
-        });
-    };
-
-    var getPageItemEdit = function (page, filter) {
-
-        var list = {};
-        list['objectName'] = filter.type;
-        list['settings']   = settings;
-
-        objectService.getStructurePromise(settings).then(function(structure) {
-            list['structure'] = structure;
-
-            return structure;
-
-        }, function(value) {
-            page.res.render('test', {
-                page: 'sa a echoué 1',
-                list: list
-            });
-        }).then(function(structure) {
-
-            objectService.getMenuP(structure, filter.type).then(function(menu) {
-                list['menu'] = menu;
-
-                objectService.getObject(settings, filter).then(function(object) {
-                    list['object'] = object;
-                    objectService.getCollectionsPromise(settings, list.structure, filter.type).then(function(collection) {
-                        list['collection'] = collection;
-
-                        objectService.getEmbedFieldsPromise(settings, collection, structure).then(function(embedFields) {
-                            list['embedFields'] = embedFields;
-
-                            objectService.getFieldsPromise(settings, structure, filter.type).then(function(fields) {
-                                list['fields'] = fields;
-                                page.res.render('edit', {
-                                    page: 'yooo fields 1',
-                                    list: list
-                                });
-                            }, function(error){
-                                page.res.render('error', {
-                                    error: 'fields error 1',
-                                    list: list
-                                });
-                            });
-                        }, function(error) {
-                            page.res.render('error', {
-                                error: 'embedFields error 1',
-                                list: list
-                            });
-                        });
-                    }, function(error){
-
-                        page.res.render('error', {
-                            error: 'collection error 1',
-                            list: list
-                        });
-                    });
-
-                },function(error) {
-                    console.log(error);
-                    error.res.render('error', {
-                        page: 'erreur list 1',
-                        list: list
-                    });
-                });
-
-            }, function(error){
-                error.res.render('error', {
-                    page: 'erreur menu 1',
-                    list: list
-                });
-            })
-
-        }).catch(function(error) {
-            console.log('exption');
-        });
-    };
-
-    var getPageCreate = function (page, filter) {
-
-        var list = {};
-        list['objectName'] = filter.type;
-        list['settings']   = settings;
-
-        objectService.getStructurePromise(settings).then(function(structure) {
-            list['structure'] = structure;
-
-            return structure;
-
-        }, function(value) {
-            page.res.render('test', {
-                page: 'sa a echoué 1',
-                list: list
-            });
-        }).then(function(structure) {
-
-            objectService.getMenuP(structure, filter.type).then(function(menu) {
-                list['menu'] = menu;
-                objectService.getCollectionsPromise(settings, list.structure, filter.type).then(function(collection) {
-                    list['collection'] = collection;
-
-                    objectService.getEmbedFieldsPromise(settings, collection, structure).then(function(embedFields) {
-                        list['embedFields'] = embedFields;
-
-                        objectService.getFieldsPromise(settings, structure, filter.type).then(function(fields) {
-                            list['fields'] = fields;
-                            page.res.render('form', {
-                                page: 'yooo fields 1',
-                                list: list
-                            });
-                        }, function(error){
-                            page.res.render('error', {
-                                error: 'fields error 1',
-                                list: list
-                            });
-                        });
-                    }, function(error) {
-                        page.res.render('error', {
-                            error: 'embedFields error 1',
-                            list: list
-                        });
-                    });
-                }, function(error){
-
-                    page.res.render('error', {
-                        error: 'collection error 1',
-                        list: list
-                    });
-                });
-
-            }, function(error){
-                error.res.render('error', {
-                    page: 'erreur menu 1',
-                    list: list
-                });
-            })
-
-        }).catch(function(error) {
-            console.log('exption');
-        });
-    };
 
 
     app.get('/test/:object/:id', function(req, res) {
@@ -313,7 +25,7 @@ module.exports = function(app, settings, callback) {
             req : req,
             res: res
         }
-        getPageItem(page, filter);
+        pageService.getPageItem(settings, page, filter);
     });
 
     app.get('/', function(req, res){
@@ -339,7 +51,7 @@ module.exports = function(app, settings, callback) {
             req : req,
             res: res
         }
-        getListPage(page, listFilter);
+        pageService.getListPage(settings, page, listFilter);
     });
 
     app.get(settings.viewItemUrl + ':object/:id', function(req, res, next){
@@ -352,7 +64,7 @@ module.exports = function(app, settings, callback) {
             req : req,
             res: res
         }
-        getPageItem(page, filter);
+        pageService.getPageItem(settings, page, filter);
     });
 
     app.get(settings.createItemUrl + ':object', function(req, res, next){
@@ -365,7 +77,7 @@ module.exports = function(app, settings, callback) {
             req : req,
             res: res
         }
-        getPageCreate(page, filter);
+        pageService.getPageCreate(settings, page, filter);
 
     });
 
@@ -380,7 +92,7 @@ module.exports = function(app, settings, callback) {
             req : req,
             res: res
         }
-        getPageItemEdit(page, filter);
+        pageService.getPageItemEdit(settings, page, filter);
 
     });
 

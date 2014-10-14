@@ -70,6 +70,45 @@ var objectService = {
         return promise;
     },
 
+    getListObjecturl : function(settings, url) {
+        var promise = new RSVP.Promise(function(resolve, reject) {
+
+            var reqOptions = {
+                url: settings.api.host + '/' + url,
+                headers: {
+                    'User-Agent': 'request'
+                }
+            };
+
+            request(reqOptions, function callback(error, response, body) {
+
+                if (error) {
+                    console.log('error');
+                    throw error;
+                } else {
+                    switch (response.statusCode) {
+                        case 200:
+                        case 201:
+
+                            var list = [];
+                            list[url] = JSON.parse(body);
+
+                            resolve(list);
+                            break;
+                        case 404:
+                            reject('404');
+                            break;
+                        case 500:
+                            reject('500');
+                            break;
+                    }
+                }
+            });
+
+        });
+        return promise;
+    },
+
 
     getListObject : function(settings, listFilter) {
         var promise = new RSVP.Promise(function(resolve, reject) {
@@ -189,6 +228,7 @@ var objectService = {
                                 if (tmpListField[field].hasOwnProperty('key') && tmpListField[field].key == true) {
                                     var tpmObject = {
                                         name: collections[collectionsCompteur].fieldName,
+                                        entity: collections[collectionsCompteur].targetObject,
                                         field: tmpListField[field].name
                                     }
                                     tmpEmbedFields.push(tpmObject);
