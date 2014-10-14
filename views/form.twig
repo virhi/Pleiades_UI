@@ -19,7 +19,9 @@
             {% set fieldValue = '' %}
             {% include "fields/field.twig"%}
         {% endfor %}
-
+        {% for field in page.embedFields %}
+            {% include "fields/select.twig" %}
+        {% endfor %}
         <div class="form-group text-right">
             <div class="col-sm-8">
             </div>
