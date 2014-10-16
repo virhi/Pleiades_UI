@@ -30,15 +30,13 @@ module.exports = function(app, settings, callback) {
 
     app.get('/', function(req, res){
 
-        var reqOptions = {
-            url: settings.api.host + '/objects/all',
-            headers: {
-                'User-Agent': 'request'
-            }
-        };
 
-        var pageObject = buildPageObject(req, res, reqOptions, 'list', false);
-        sendPage(pageObject);
+        var page = {
+            req : req,
+            res: res
+        }
+
+        pageService.getIndex(settings, page);
     });
 
     app.get('/list/:object', function(req, res, next) {

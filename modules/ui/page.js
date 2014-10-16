@@ -6,6 +6,44 @@ var objectService = require(__dirname + '/objectService.js');
 
 var page = {
 
+    getIndex : function (settings, page) {
+
+        var list = {};
+        list['objectName'] = 'index';
+        list['settings']   = settings;
+
+        objectService.getStructurePromise(settings).then(function(structure) {
+            list['structure'] = structure;
+
+            return structure;
+
+        }, function(value) {
+            page.res.render('test', {
+                page: 'sa a echoué 1',
+                list: list
+            });
+        }).then(function(structure) {
+
+            objectService.getMenuP(structure, null).then(function(menu) {
+                list['menu'] = menu;
+
+            }, function(error){
+                page.res.render('error', {
+                    error: 'erreur menu 1',
+                    list: list
+                });
+            })
+
+        }).then(function() {
+            page.res.render('list', {
+                list: list
+            });
+        }).catch(function(error) {
+            console.log(error);
+            console.log('exption');
+        });
+    },
+
     getListPage : function (settings, page, listFilter) {
 
         var list = {};
