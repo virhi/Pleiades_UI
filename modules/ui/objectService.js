@@ -208,7 +208,7 @@ var objectService = {
     },
 
 
-    getEmbedFieldsPromise: function (settings, collections, models) {
+    getEmbedFieldsPromise: function (settings, object, collections, models) {
 
 
         var promise = new RSVP.Promise(function(resolve, reject) {
@@ -231,6 +231,18 @@ var objectService = {
                                         entity: collections[collectionsCompteur].targetObject,
                                         field: tmpListField[field].name
                                     }
+
+
+                                    var tpmObjectSelected = [];
+
+                                    for (objectItem in object) {
+                                       for (objectSelected in object[objectItem][tpmObject.name]) {
+
+                                           var tmp = object[objectItem][tpmObject.name][objectSelected];
+                                           tpmObjectSelected.push(tmp[tpmObject.field]);
+                                       }
+                                    }
+                                    tpmObject['objectSelected'] = tpmObjectSelected;
                                     tmpEmbedFields.push(tpmObject);
                                 }
                             }

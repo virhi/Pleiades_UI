@@ -22,6 +22,7 @@
                         {% include "fields/field.twig" %}
                     {% endfor %}
                     {% for field in list.embedFields %}
+                        {% set embedField = list.embeded %}
                         {% include "fields/select.twig" %}
                     {% endfor %}
                     <div class="form-group text-right">

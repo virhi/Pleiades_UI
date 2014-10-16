@@ -23,6 +23,15 @@
                             {% include "fields/field.twig" %}
                         {% endfor %}
                         {% for field in list.embedFields %}
+                            {% set fieldValue =  [] %}
+                            {% set embedField = list.embeded %}
+                            {% set fieldEmbed =  attribute(object, field.name) %}
+
+                            {% for ief in fieldEmbed %}
+                                {% set fieldValue =  fieldValue|merge([attribute(ief, field.field)]) %}
+                            {% endfor %}
+
+                            {{ dump(fieldValue) }}
                             {% include "fields/select.twig" %}
                         {% endfor %}
                     </fieldset>

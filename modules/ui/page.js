@@ -32,7 +32,7 @@ var page = {
                     objectService.getCollectionsPromise(settings, list.structure, listFilter.type).then(function(collection) {
                         list['collection'] = collection;
 
-                        objectService.getEmbedFieldsPromise(settings, collection, structure).then(function(embedFields) {
+                        objectService.getEmbedFieldsPromise(settings, [], collection, structure).then(function(embedFields) {
                             list['embedFields'] = embedFields;
 
                             objectService.getFieldsPromise(settings, structure, listFilter.type).then(function(fields) {
@@ -107,15 +107,39 @@ var page = {
                     objectService.getCollectionsPromise(settings, list.structure, filter.type).then(function(collection) {
                         list['collection'] = collection;
 
-                        objectService.getEmbedFieldsPromise(settings, collection, structure).then(function(embedFields) {
+                        objectService.getEmbedFieldsPromise(settings, object, collection, structure).then(function(embedFields) {
                             list['embedFields'] = embedFields;
 
                             objectService.getFieldsPromise(settings, structure, filter.type).then(function(fields) {
                                 list['fields'] = fields;
-                                page.res.render('item', {
-                                    page: 'yooo fields 1',
-                                    list: list
+
+
+                                var tpmCollection = [];
+
+                                for (x in collection) {
+                                    var url = collection[x].targetObject;
+                                    tpmCollection.push(url);
+                                }
+
+                                var promises = tpmCollection.map(function(url){
+                                    return objectService.getListObjecturl(settings, url);
                                 });
+
+                                RSVP.all(promises).then(function(embeded) {
+                                    list['embeded'] = embeded;
+                                    page.res.render('item', {
+                                        page: 'yooo list object 1',
+                                        list: list
+                                    });
+                                }, function (error) {
+
+                                    page.res.render('error', {
+                                        error: 'fields list object 1 ' + error,
+                                        list: list
+                                    });
+                                })
+
+
                             }, function(error){
                                 page.res.render('error', {
                                     error: 'fields error 1',
@@ -182,15 +206,36 @@ var page = {
                     objectService.getCollectionsPromise(settings, list.structure, filter.type).then(function(collection) {
                         list['collection'] = collection;
 
-                        objectService.getEmbedFieldsPromise(settings, collection, structure).then(function(embedFields) {
+                        objectService.getEmbedFieldsPromise(settings, object, collection, structure).then(function(embedFields) {
                             list['embedFields'] = embedFields;
 
                             objectService.getFieldsPromise(settings, structure, filter.type).then(function(fields) {
                                 list['fields'] = fields;
-                                page.res.render('edit', {
-                                    page: 'yooo fields 1',
-                                    list: list
+
+                                var tpmCollection = [];
+
+                                for (x in collection) {
+                                    var url = collection[x].targetObject;
+                                    tpmCollection.push(url);
+                                }
+
+                                var promises = tpmCollection.map(function(url){
+                                    return objectService.getListObjecturl(settings, url);
                                 });
+
+                                RSVP.all(promises).then(function(embeded) {
+                                    list['embeded'] = embeded;
+                                    page.res.render('edit', {
+                                        page: 'yooo list object 1',
+                                        list: list
+                                    });
+                                }, function (error) {
+
+                                    page.res.render('error', {
+                                        error: 'fields list object 1 ' + error,
+                                        list: list
+                                    });
+                                })
                             }, function(error){
                                 page.res.render('error', {
                                     error: 'fields error 1',
@@ -254,7 +299,7 @@ var page = {
                 objectService.getCollectionsPromise(settings, list.structure, filter.type).then(function(collection) {
                     list['collection'] = collection;
 
-                    objectService.getEmbedFieldsPromise(settings, collection, structure).then(function(embedFields) {
+                    objectService.getEmbedFieldsPromise(settings, [], collection, structure).then(function(embedFields) {
                         list['embedFields'] = embedFields;
 
                         objectService.getFieldsPromise(settings, structure, filter.type).then(function(fields) {
