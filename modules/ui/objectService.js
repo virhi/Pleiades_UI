@@ -90,10 +90,10 @@ var objectService = {
                         case 200:
                         case 201:
 
-                            var list = [];
-                            list[url] = JSON.parse(body);
+                            var urls = [];
+                            urls[url] = JSON.parse(body);
 
-                            resolve(list);
+                            resolve(urls);
                             break;
                         case 404:
                             reject('404');
@@ -236,6 +236,7 @@ var objectService = {
                                     var tpmObjectSelected = [];
 
                                     for (objectItem in object) {
+
                                        for (objectSelected in object[objectItem][tpmObject.name]) {
 
                                            var tmp = object[objectItem][tpmObject.name][objectSelected];

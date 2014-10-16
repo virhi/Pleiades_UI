@@ -13,21 +13,6 @@ module.exports = function(app, settings, callback) {
     app.engine('twig', twig.__express);
 
 
-
-    app.get('/test/:object/:id', function(req, res) {
-
-        var filter = {
-            type : req.params.object,
-            id   : req.params.id
-        }
-
-        var page = {
-            req : req,
-            res: res
-        }
-        pageService.getPageItem(settings, page, filter);
-    });
-
     app.get('/', function(req, res){
 
 
@@ -39,7 +24,7 @@ module.exports = function(app, settings, callback) {
         pageService.getIndex(settings, page);
     });
 
-    app.get('/list/:object', function(req, res, next) {
+    app.get( settings.viewListUrl + ':object', function(req, res, next) {
 
         var listFilter = {
             type : req.params.object
@@ -76,6 +61,27 @@ module.exports = function(app, settings, callback) {
             res: res
         }
         pageService.getPageCreate(settings, page, filter);
+
+    });
+
+    app.get(settings.deleteItemUrl + ':object/:id', function(req, res, next){
+
+        var options = {
+            method: 'DELETE',
+            url: settings.api.host + '/' + req.params.object,
+            headers: {
+                'User-Agent': 'request',
+                'Content-Type': 'application/json',
+                'X-Fields': '{"id": ' + req.params.id + '}'
+            },
+            body: JSON.stringify(req.body)
+        };
+
+        request(options, function callback(error, response, body) {
+
+            res.redirect(settings.viewListUrl + req.params.object);
+
+        });
 
     });
 

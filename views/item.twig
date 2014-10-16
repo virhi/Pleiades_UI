@@ -28,10 +28,9 @@
                             {% set fieldEmbed =  attribute(object, field.name) %}
 
                             {% for ief in fieldEmbed %}
-                                {% set fieldValue =  fieldValue|merge([attribute(ief, field.field)]) %}
+                                {% set tpmVal = [attribute(ief, field.field)] %}
+                                {% set fieldValue =  fieldValue|merge(tpmVal) %}
                             {% endfor %}
-
-                            {{ dump(fieldValue) }}
                             {% include "fields/select.twig" %}
                         {% endfor %}
                     </fieldset>
@@ -40,6 +39,7 @@
                         </div>
                         <div class="col-sm-4 ">
                             <a href="{{ [list.settings.editItemUrl, list.objectName,'/',object.id]|join }}" class="btn btn-primary">Edit</a>
+                            <a href="{{ [list.settings.deleteItemUrl, list.objectName,'/',object.id]|join }}" class="btn btn-danger">Delete</a>
                         </div>
                     </div>
                 </form>

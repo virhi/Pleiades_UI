@@ -13,9 +13,11 @@ var defaultSettings = {
     api: {
         host: "http://10.10.10.161:3000"
     },
+    viewListUrl: "/list/",
     viewItemUrl: "/item/",
     editItemUrl: "/edit/",
     createItemUrl: "/create/",
+    deleteItemUrl: "/delete/",
     editResultItemUrl: "/edit_result/",
     createResultItemUrl: "/create_result/",
     squeleteFields: 'model.fields',

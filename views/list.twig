@@ -12,10 +12,25 @@
 {% endblock %}
 
 {% block content %}
-    Voici mon message :
 
-    {% for object in list.structure %}
-        {{ object.name }}
-    {% endfor %}
+    <div class="jumbotron">
+        <h2>Pleiade UI</h2>
+        <p>Bienvenu a toi jeune padawon</p>
+        <p>Cette interface est automatiquement generé au dessus du backend <a href="https://www.npmjs.org/package/pleiades">Pleiade</a></p>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Classe(s) définie dans le backend <a href="https://www.npmjs.org/package/pleiades">Pleiade</a></div>
+            <div class="panel-body">
+                <ul class="list-group">
+                    {% for object in list.structure %}
+                        <li class="list-group-item"><a href="{{ [list.settings.viewListUrl, object.name]|join }}">{{ object.name }}</a></li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+
+        <p><a class="btn btn-primary btn-lg" role="button" href="https://github.com/virhi/Pleiades_UI">Learn more</a></p>
+    </div>
 
 {% endblock %}

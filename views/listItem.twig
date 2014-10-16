@@ -49,6 +49,7 @@
                         <td class="text-center">
                             <a href="{{ [list.settings.viewItemUrl, list.objectName,'/',object.id]|join }}" class="btn btn-primary">View</a>
                             <a href="{{ [list.settings.editItemUrl, list.objectName,'/',object.id]|join }}" class="btn btn-primary">Edit</a>
+                            <a href="{{ [list.settings.deleteItemUrl, list.objectName,'/',object.id]|join }}" class="btn btn-danger">Delete</a>
                         </td>
                     </tr>
                 {% endfor %}
