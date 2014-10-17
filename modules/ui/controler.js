@@ -120,6 +120,7 @@ module.exports = function(app, settings, callback) {
     });
 
     app.post(settings.createResultItemUrl + ':object', function(req, res) {
+
         var options = {
             method: 'POST',
             url: settings.api.host + '/' + req.params.object,
@@ -130,10 +131,13 @@ module.exports = function(app, settings, callback) {
             body: JSON.stringify(req.body)
         };
 
+
         request(options, function callback(error, response, body) {
             var createObject = JSON.parse(body);
+            console.log(createObject);
             res.redirect(settings.viewItemUrl + req.params.object + '/' + createObject[0].id);
         });
+
     });
 
     app.post(settings.editResultItemUrl + ':object/:id', function(req, res) {

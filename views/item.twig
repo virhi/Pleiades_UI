@@ -20,6 +20,7 @@
                     <fieldset disabled>
                         {% for fieldName, field in list.fields %}
                             {% set fieldValue =  attribute(object, fieldName) %}
+                            {% set created = false %}
                             {% include "fields/field.twig" %}
                         {% endfor %}
                         {% for field in list.embedFields %}

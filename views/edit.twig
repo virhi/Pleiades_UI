@@ -19,6 +19,7 @@
                 <form class="form-horizontal" role="form" method="post" action="{{ [list.settings.editResultItemUrl, list.objectName, '/', object.id]|join }}">
                     {% for fieldName, field in list.fields %}
                         {% set fieldValue =  attribute(object, fieldName) %}
+                        {% set created = false %}
                         {% include "fields/field.twig" %}
                     {% endfor %}
                     {% for field in list.embedFields %}
